@@ -1,7 +1,4 @@
-﻿//#define EUCA_DEBUG
-using System;
-using System.Collections.Generic;
-/*************************************************************************
+﻿/*************************************************************************
  * Copyright 2010-2012 Eucalyptus Systems, Inc.
  *
  * Redistribution and use of this software in source and binary forms,
@@ -27,6 +24,10 @@ using System.Collections.Generic;
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ************************************************************************/
+
+//#define EUCA_DEBUG
+using System;
+using System.Collections.Generic;
 using System.Net;
 using System.IO;
 using System.Text;
@@ -74,9 +75,10 @@ namespace Com.Eucalyptus.Windows.EucaServiceLibrary
         /// Steps to configure the windows instances
         /// 1. Wait for the network connectivity become active
         /// 2. Setup ACPI/remote desktop allowance
-        /// 3. Change admin's password
-        /// 4. Change hostname (and reboot)
-        /// 5. Join AD
+        /// 3. Format uninitialize drives
+        /// 4. Change admin's password
+        /// 5. Change hostname (and reboot)
+        /// 6. Join AD
         /// </summary>
         /// <param name="configFileLocation"></param>
         public virtual void DoBootstrap(string configFileLocation)
@@ -88,7 +90,7 @@ namespace Com.Eucalyptus.Windows.EucaServiceLibrary
 
                 _configLocation = configFileLocation;
 
-                EucaLogger.Info(string.Format("EucaServiceLibrary called with config= {0}!", configFileLocation));
+                EucaLogger.Info(string.Format("EucaServiceLibrary with config= {0}!", configFileLocation));
                 EucaLogger.Info(string.Format("OS: {0},  SP: {1}, 64bit?:{2}", OSEnvironment.OS_Name, OSEnvironment.OS_ServicePack, OSEnvironment.Is64bit));
                 try
                 {
@@ -194,8 +196,13 @@ namespace Com.Eucalyptus.Windows.EucaServiceLibrary
             }
 
             //// create a partiton and format ephemeral storage
-            if (EucaConstant.JustLaunched)
-            {
+            // 1. On initial boot, or restart, the ES will appear as an
+            //    un-initialized disk with no partitions.
+            // 2. On reboot, the ES setting are non-volitile, thus needs no formatting.
+            // 3. Note: This step is not reached if the service is not running 
+            //    on a ec2 image since the instance_id can not detected.
+            // if (EucaConstant.JustLaunched)
+            // {
                 try
                 {
                     int format = (int)EucaUtil.GetRegistryValue(
@@ -208,9 +215,10 @@ namespace Com.Eucalyptus.Windows.EucaServiceLibrary
                 }
                 catch (Exception e)
                 {
-                    EucaLogger.Exception(string.Format("Failed to initialize attached disks ({0})", e.Message), e);
+                    EucaLogger.Debug("No Ephemeral attached disks were formatted");
+                   // EucaLogger.Exception(string.Format("Failed to initialize attached disks ({0})", e.Message), e);
                 }
-            }
+            //}
 
             // if the instance was just launched, and already a member of AD, then detach it from AD
             try
@@ -923,6 +931,7 @@ namespace Com.Eucalyptus.Windows.EucaServiceLibrary
                         sw.WriteLine(string.Format("echo Y echo Y | format {0}: /q /fs:ntfs", letter, i++));
                         sw.Flush();
                     }
+                    EucaLogger.Debug("Formatting Drive:" + letter);
                     Win32_CommandResult result = EucaUtil.SpawnProcessAndWait("C:\\dformat.bat", null);
                     if (result.Stdout == null || !result.Stdout.Contains("Format complete"))
                     {
