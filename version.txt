@@ -1,0 +1,70 @@
+v0.1.1 09/23/10
+In response to XP's reboot problem, added the reason code
+	uint dwReason = 0x00040000 | 0x00000001 | 0x80000000; // major application, minor maintenance, planned
+
+v.0.1.2 09/24/10
+When server2008 instance joins a domain, it's current network profile is changed and the RDP port might not be unblocked from firewall.
+fixed this by enumerating and changing all network profile types.
+
+v.0.1.3 09/24/10
+This change remaps the OS version to GPLPV packages.
+
+v.0.1.4  09/29/10
+Windows VMs crashes due to intengration tool's rebooting attempt.
+To fix, few seconds of grace period is set before reboot. This will extend window's booting time upto 40 seconds.
+
+v.0.1.5 09/29/10
+Setting arbitrary grace period before reboot can allow users to initiate remote desktop. So, this version wait for the network connectivity before instance calls reboot function.
+
+v0.1.6 09/30/10
+Leaving domain admin's username/passwd is not secure, even in encrypted form. This version removes admin uname/password from the image.
+
+v0.1.7 09/30/10
+Flush registry changes.
+
+v0.1.8 10/04/10
+AD.CheckAndDetach() implemented. When the instance is just launched and already a domain member, it is immediately detached from the domain.
+Euca-bundle-instance wouldn't keep the domain membership. 
+
+v0.1.9 11/16/10
+Remote desktop user/group permission is implemented. Updated GPLPV to the latest version (0.11.0.238)
+
+v0.1.10 11/17/10
+Dispose() call on WMI object was added (Shouldn't affect functionality, but to make sure resources are properly cleaned).
+
+v0.1.11 12/21/10
+Support for ephemeral storage: disk partition and formatting during the boot process
+
+v0.1.12 1/5/11
+Support for system mode IP discovery for Hyper-V
+
+v0.1.13 1/27/11
+Support for sysprep and multiple ephemeral disk initialization
+
+v0.1.14 03/31/11
+Added app.manifest for admin GUI and its executor. It fixes require-admin problem with Win 7.
+
+v0.1.15 04/13/11
+[EucaServiceLibrary.dll] With Centos 5.6, the VM's floppy drive is write-protected. The version doesn't use "just-launched" flags on the floppy.
+
+v0.1.16 07/18/11
+[EucaServiceLibrary.dll] Fix ephemeral disk initialization issue on KVM
+
+v0.1.17 07/21/11
+[EucaServiceLibrary.dll] Fix to adapt to VMWARE. 
+
+v0.1.18 08/05/11
+[EucaServiceLibrary.dll] Check if RDP port is open from firewall setting, everytime an instance starts (wasn't enabled in S2008,S2008R2, Win7)
+[AdminGui.exe] Prompt warning if a user try to close without saving changes
+
+v0.1.19 08/29/11
+[AdminGui.exe, AdminGuiExecutor.exe] Changed the icon following Eucalyptus logo changes
+
+v.0.1.20 09/14/11
+Updated the sysprep template files to extend the os partition (2008, 2008R2, Win7)
+
+v.0.1.21 09/19/11
+[EucaServiceLibrary.dll] Activate Administrator account on every service startup
+
+v.1.0.0 1/6/12
+Ship the software!

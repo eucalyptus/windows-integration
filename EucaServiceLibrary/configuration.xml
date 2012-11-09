@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Configuration xmlns="http://eucalyptus.com" version="0.1">
+  <Hostname> eucahost01 </Hostname>
+  <LocalAccount>
+    <Username> Administrator </Username>
+    <Password> hellpass</Password>
+  </LocalAccount>
+  <ActiveDirectory>
+    <JoinOnBoot> true </JoinOnBoot>
+    <AD> win2008park.eucalyptus</AD>
+    <ADUsername> Administrator </ADUsername>
+    <ADPassword> somepass$</ADPassword>
+  </ActiveDirectory>  
+</Configuration>

@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="WindowsInstanceConfiguration" targetNamespace="http://eucalyptus.com"
+    elementFormDefault="qualified" xmlns="http://eucalyptus.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="Configuration">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Hostname" type="xs:string" nillable="1" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="LocalAccount" minOccurs="0" maxOccurs="1" nillable="true">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Username" type="xs:string" minOccurs="1" maxOccurs="1"/>
+              <xs:element name="Password" type="xs:string" minOccurs="1" maxOccurs="1"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>        
+        <xs:element name="ActiveDirectory" nillable="true" minOccurs="0" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="JoinOnBoot" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+              <xs:element name="AD" type="xs:string" minOccurs="0" maxOccurs="1" />
+              <xs:element name="ADUsername" type="xs:string" minOccurs="0" maxOccurs="1"/>
+              <xs:element name="ADPassword" type="xs:string" minOccurs="0" maxOccurs="1"/>
+              <xs:element name="OU" type="xs:string" nillable="true" minOccurs="0" maxOccurs="1"/>
+              <xs:element name="Overwrite" type="xs:boolean" minOccurs="0" maxOccurs="1"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="version" type="xs:string" use="optional"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
