@@ -89,7 +89,7 @@ namespace Com.Eucalyptus.Windows.EucaServiceLibrary
                 EucaLogger.LogLocation = string.Format("{0}\\eucalog.txt", installLocation);
 
                 _configLocation = configFileLocation;
-
+                EucaLogger.Info(string.Format("Eucalyptus Systems Inc. Windows Service ver 1.02, 11/13/2012"));
                 EucaLogger.Info(string.Format("EucaServiceLibrary with config= {0}!", configFileLocation));
                 EucaLogger.Info(string.Format("OS: {0},  SP: {1}, 64bit?:{2}", OSEnvironment.OS_Name, OSEnvironment.OS_ServicePack, OSEnvironment.Is64bit));
                 try
@@ -201,6 +201,9 @@ namespace Com.Eucalyptus.Windows.EucaServiceLibrary
             // 2. On reboot, the ES setting are non-volitile, thus needs no formatting.
             // 3. Note: This step is not reached if the service is not running 
             //    on a ec2 image since the instance_id can not detected.
+
+            //  euca 3011 .. this is sequence all the time. 
+            //
             // if (EucaConstant.JustLaunched)
             // {
                 try

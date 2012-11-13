@@ -1,3 +1,8 @@
+v 1.0.2 11/13/2012
+ - Added version banner that is logged in c:\programs(x86)\eucalyptus\eucalog
+ - Corrected defect 3011: Starting a stopped bfEBS instance on Windows doesn't 
+   initialize ephemeral.
+
 v0.1.1 09/23/10
 In response to XP's reboot problem, added the reason code
 	uint dwReason = 0x00040000 | 0x00000001 | 0x80000000; // major application, minor maintenance, planned
