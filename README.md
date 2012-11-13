@@ -1,21 +1,14 @@
-
 windows-integration
 ===================
 
-Verison 1.02   11/14/2012
+Eucalyptus windows integration is an implementation of Windows Service that runs in the Windows VM instances to prepare the VMs to work with Eucalyptus backend. The installation and usage manuals can be found at http://www.eucalyptus.com/docs.
 
+The tool is primarily written in C# and has been tested with Visual Studio 2010 SP1.
 
-This package was created using ICSharpCode.SharpZipLib.dll version 860
-from http://www.icsharpcode.net/opensource/sharpziplib/Download.aspx.
+BUILDING
+1. git clone windows-integration. 
 
-
-
-Eucalyptus Windows Integration tool
-
-
-1. git clone  windows-integration. 
-
-2. If neccessry, copy ICSharpCode.SharpZipLib.dll to  windows-integration/EucaWindowsService
+2. If neccessry, update reference to ICSharpCode.SharpZipLib.dll.
 
   2a. Start ->Programs -> Visual Studio 2010.
 
@@ -28,30 +21,21 @@ Eucalyptus Windows Integration tool
       and add it again:
 
      DELETE:
-
-     - High Lite "windows-integration/EucaWindowsService->References"
+     - Open "windows-integration/EucaWindowsService->References"
      - Right Click on ICSharpCode.SharpZipLib, and "Delete" 
 
      ADD:
-
-     - High Lite "windows-integration/EucaWindowsService->References"
+     - Open "windows-integration/EucaWindowsService->References"
      - Right Click -> "Add references" 
-     - Navigate to windows-integration/EucaWindowsService 
-     - select "ICSharpCode.SharpZipLib.dll " 
+     - Browse to the directory that includes "ICSharpCode.SharpZipLib" and select.
 
-3. Build using "Build" pull down in VS. 
+3. Select Eucalyptus Package project and build.
 
-4. The executables are windows-integration/EucalyptusPackage/Debug 
-
+4. After the build is complete, the executables can be found at windows-integration/EucalyptusPackage/Debug 
       Windows 2008 and later: EucalyptusWindowsIntegration.msi  
-      Windows 2003:           setup.exe
+      Windows 2003:           setup.exe (includes .NET 2.0 redistributable)
 
-
-5.  Installing Eucalyptus on Windows 2008 x64 (and later)
-    requires signed drivers to be disabled :
-
-      bcdedit -set loadoptions DISABLE_INTEGRITY_CHECKS
-      bcdedit -set TESTSIGNING ON 
-
- 
-     
+INSTALLATION
+1. Before bundling and registering the Windows VMs to Eucalyptus, the executables should be copied to Windows VMs and be installed.
+2. During the installation, either Virtio (KVM) or XEN PV drivers (Xen) will be installed. Make sure the Windows device manager detects the driver correctly.
+3. For more details, refer to Eucalyptus Administration Guide (Managing images > Create an image > Create Windows image) 
