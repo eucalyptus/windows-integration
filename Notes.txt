@@ -1,0 +1,39 @@
+
+
+1. The resultant executeables: EucalyptusWindowsIntegration.msi  
+    and setup.exe, have to ran as "Administator" on the client.
+    Failure to do so will result in a message " Cannot Open Device/File"
+    during installation, and the install will fail. 
+
+2. Automatic updating of EucaServiceLibrary.dll via floppy on existing instances.
+
+   It is possible to invoke instances when they boot that have a older version 
+   of the Eucaservice without re-creating the images to use a new version of the 
+   dll service.   
+   
+  
+   a. open EucaServiceLibrary > Properties > AssemblyInfo.cs.
+   b. change AssemblyVersion and AssemblyFileVersion. For example, "1.0.0.0" -> "1.0.0.1".
+   c. build the project and you will have a new DLL in the Debug folder
+ 
+    To embed the DLL to the floppy:
+  
+   a. assuming you have the eucalyptus repo cloned
+   b. you will see the floopy file at /tools/floppy.
+   c. create a mount point (e.g., /mnt/floppy)
+   d. mount the loopback file ( mount ./tools/floppy /mnt/floppy -o loop)
+   e. copy the EucaService.dll to /mnt/floppy and unmount (/mnt/floppy)
+   f. commit and push the updated /tools/floppy to euca repository 
+      (make sure you're on the right branch).
+
+3. Creating a iso.
+
+   Use Deep Burner on Windows. 
+  
+    Add  
+
+    EucalyptusWindowsIntegration.msi  
+    setup.exe
+    Eucalyptus/Licenses 
+
+    to CD image, select "Burn" , Save as ISO. 
