@@ -130,7 +130,7 @@ namespace Com.Eucalyptus.Windows.EucaWindowsService
 
             if (!configFileFound && batFileLoc == null)
             {
-                Log("CRITICAL: Cannot find configuration files");
+                Log("CRITICAL: Cannot find A:configuration.xml files, nothing to do! ");
                 return;
             }
 
@@ -179,7 +179,7 @@ namespace Com.Eucalyptus.Windows.EucaWindowsService
             }
 
             if (!configFileFound) {
-                Log("CRITICAL: configuration file is not found");
+                Log("CRITICAL: configuration file is not found, nothing to do.");
                 return;
             }
             
