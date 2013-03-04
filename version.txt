@@ -1,3 +1,10 @@
+
+v 1.0.3 3/04/2013
+- Corrected the behaviour where XENVP was installed  even when not selected
+  ( Set the Condition = CHECKBOXVIRTIO=1 and CHECKBOXXENPV=1  on properties 
+    of virtio.zip and xenvp.zip )
+	 Bumped version to 1.0.0.2 and date. 
+
 v 1.0.2 11/13/2012
  - Added version banner that is logged in c:\programs(x86)\eucalyptus\eucalog
  - Corrected defect 3011: Starting a stopped bfEBS instance on Windows doesn't 

@@ -89,7 +89,7 @@ namespace Com.Eucalyptus.Windows.EucaServiceLibrary
                 EucaLogger.LogLocation = string.Format("{0}\\eucalog.txt", installLocation);
 
                 _configLocation = configFileLocation;
-                EucaLogger.Info(string.Format("Eucalyptus Systems Inc. Windows Service ver 1.0.0.1, 11/15/2012"));
+                EucaLogger.Info(string.Format("Eucalyptus Systems Inc. Windows Service ver 1.0.0.2, 3/4/2014"));
                 EucaLogger.Info(string.Format("EucaServiceLibrary with config= {0}!", configFileLocation));
                 EucaLogger.Info(string.Format("OS: {0},  SP: {1}, 64bit?:{2}", OSEnvironment.OS_Name, OSEnvironment.OS_ServicePack, OSEnvironment.Is64bit));
                 try
