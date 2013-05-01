@@ -368,7 +368,7 @@ namespace Com.Eucalyptus.Windows
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(100, 20);
             this.label1.TabIndex = 100;
-            this.label1.Text = "AD Address";
+            this.label1.Text = "AD Domain";
             this.label1.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // buttonApply
