@@ -236,7 +236,9 @@ namespace Com.Eucalyptus.Windows.EucaServiceLibrary
 
             try
             {
-                HostnameManager.Instance.UpdateHostname(Configuration);
+                if (EucaConstant.JustLaunched)
+                    HostnameManager.Instance.UpdateHostname(Configuration);
+                
                 if (_rebootRequired)
                 {
                     EucaLogger.Info("The system is now rebooting");
