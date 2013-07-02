@@ -80,3 +80,7 @@ v.0.1.21 09/19/11
 
 v.1.0.0 1/6/12
 Ship the software!
+
+v.1.0.1 07/01/13
+few bug fixes pulled from github
+updated virtio driver (0.1-59 17-Apr-2013). deprecated xenpv driver. support for server 2012.

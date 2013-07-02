@@ -127,6 +127,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\EucaCommon\Utility\EucaCommon.csproj">
+      <Project>{0DD04696-FBCD-4F70-BEA6-BF9B147F78FE}</Project>
+      <Name>EucaCommon</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EucaServiceLibrary\EucaServiceLibrary.csproj">
       <Project>{A0597B9F-13DE-4313-BEF3-99E923FA8B0D}</Project>
       <Name>EucaServiceLibrary</Name>

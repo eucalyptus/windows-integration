@@ -1,5 +1,5 @@
 ﻿/*************************************************************************
- * Copyright 2010-2012 Eucalyptus Systems, Inc.
+ * Copyright 2010-2013 Eucalyptus Systems, Inc.
  *
  * Redistribution and use of this software in source and binary forms,
  * with or without modification, are permitted provided that the following
@@ -98,152 +98,6 @@ namespace Com.Eucalyptus.Windows
     
     class Program
     {
-        internal class OSEnvironment
-        {
-            public enum Enum_OsName { XP, Vista, Win7, S2003, S2003R2, S2008, S2008R2, NOTYETDETERMINED, UNKNOWN }
-
-            private static Enum_OsName _osName = Enum_OsName.NOTYETDETERMINED;
-            internal static Enum_OsName OS_Name
-            {
-                get
-                {
-                    if (_osName == Enum_OsName.NOTYETDETERMINED)
-                    {
-                        try
-                        {
-                            string osName = "";
-                            using (ManagementObject manObj =
-                                WMIUtil.QueryLocalWMI(@"\\.\root\CIMV2", "Select * from win32_operatingsystem"))
-                            {
-                                osName = (string)manObj["Name"];
-                            }
-                            if (osName.Contains("XP"))
-                            {
-                                _osName = Enum_OsName.XP;
-                            }
-                            else if (osName.Contains("2003 R2"))  
-                            {
-                                _osName = Enum_OsName.S2003R2;
-                            }
-                            else if (osName.Contains("2003"))
-                            {
-                                _osName = Enum_OsName.S2003;
-                            }
-                            else if (osName.Contains("Windows 7") | osName.Contains("Windowsr 7"))
-                            {
-                                _osName =Enum_OsName.Win7;
-                            }
-                            else if (osName.Contains("2008 R2"))
-                            {
-                                _osName = Enum_OsName.S2008R2;
-                            }
-                            else if (osName.Contains("2008"))
-                            {
-                                _osName = Enum_OsName.S2008;
-                            }
-                            else if (osName.Contains("Vista"))
-                            {
-                                _osName = Enum_OsName.Vista;
-                            }
-                            else
-                                _osName = Enum_OsName.UNKNOWN;
-                        }
-                        catch (Exception e)
-                        {
-                            _osName = Enum_OsName.UNKNOWN;
-                            Log("Can't figure out the OS name and version");
-                        }
-                    }
-                    return _osName;
-                }
-
-            }
-
-            private static string _osSuite = null;
-            internal static string OS_Suite
-            {
-                get { return _osSuite; }
-            }
-
-            /// <summary>
-            ///  the installed service pack
-            /// </summary>
-            private static string _osServicePack = null;
-            private static bool _osServicePackQueried = false;
-            internal static string OS_ServicePack
-            {
-                get
-                {
-                    if (!_osServicePackQueried)
-                    {
-                        using (ManagementObject objOs = WMIUtil.QueryLocalWMI(@"\\.\root\CIMV2", "Select * from win32_operatingsystem"))
-                        {
-                            try
-                            {
-                                _osServicePack = (string)objOs["CSDVersion"];
-                            }
-                            catch (Exception)
-                            {
-                                Log("Service pack couldn't be determined");
-                                _osServicePack = null;
-                            }
-                            finally
-                            {
-                                _osServicePackQueried = true;
-                            }
-                        }
-                    }
-                    return _osServicePack;
-                }
-            }
-
-            public static bool ServicePackEqualHigherThan(int spNum)
-            {
-                try
-                {
-                    string strSP = OS_ServicePack;
-                    int nSP = int.Parse(strSP.Replace("Service Pack", "").Trim());
-                    return spNum <= nSP;
-                }
-                catch (Exception)
-                {
-                    return false;
-                }
-            }
-
-            private static bool _bitSizeQueried = false;
-            private static bool _is64bit = false;
-            public static bool Is64bit
-            {
-                get
-                {
-                    if (!_bitSizeQueried)
-                    {
-                        try
-                        {
-                            using (ManagementObject objOs = WMIUtil.QueryLocalWMI(@"\\.\root\CIMV2", "Select * from win32_computersystem"))
-                            {
-                                string systype = (string)objOs["SystemType"];
-                                if (systype.Contains("64"))
-                                    _is64bit = true;
-                                else
-                                    _is64bit = false;
-                            }
-                        }
-                        catch (Exception)
-                        {
-                            Log("64bitness couldn't be determined");
-                            _is64bit = false;
-                        }
-                        finally
-                        {
-                            _bitSizeQueried = true;
-                        }
-                    }
-                    return _is64bit;
-                }
-            }
-        }
         private static void SetRegistryValue(string key, object value)
         {
             if (key == null || value == null)
@@ -280,16 +134,15 @@ namespace Com.Eucalyptus.Windows
             }
         }
 
-
+        private static string strLogPath = null;
         public static void Log(string msg)
         {
-            object obj = GetRegistryValue("InstallLocation");
-            string strPath = (obj!=null) ? ((string)obj)+"\\eucalog_install.txt" : "C:\\eucalog_install.txt";
-            using (System.IO.StreamWriter sw = 
-                new System.IO.StreamWriter(strPath, true))
-            {
-                sw.WriteLine(msg);
+            if (strLogPath == null){
+                object obj = GetRegistryValue("InstallLocation");
+                strLogPath = (obj != null) ? ((string)obj) + "\\eucalog_install.txt" : "C:\\eucalog_install.txt";
+                EucaLogger.LogLocation = strLogPath;
             }
+            EucaLogger.Debug(msg);
         }
 
         static int Main(string[] args)
@@ -338,10 +191,10 @@ namespace Com.Eucalyptus.Windows
             {
                 try
                 {
-                    if (Program.OSEnvironment.OS_Name == OSEnvironment.Enum_OsName.S2008 ||
-                        Program.OSEnvironment.OS_Name == OSEnvironment.Enum_OsName.S2008R2 ||
-                        Program.OSEnvironment.OS_Name == OSEnvironment.Enum_OsName.Vista ||
-                        Program.OSEnvironment.OS_Name == OSEnvironment.Enum_OsName.Win7)
+                    if (OSEnvironment.OS_Name == OSEnvironment.Enum_OsName.S2008 ||
+                        OSEnvironment.OS_Name == OSEnvironment.Enum_OsName.S2008R2 ||
+                        OSEnvironment.OS_Name == OSEnvironment.Enum_OsName.Vista ||
+                        OSEnvironment.OS_Name == OSEnvironment.Enum_OsName.Win7)
                     {
                         TurnOffRecovery();
                         Log("System crash recovery option is disabled");
@@ -360,10 +213,10 @@ namespace Com.Eucalyptus.Windows
             {
                 try
                 {
-                    if (Program.OSEnvironment.OS_Name == OSEnvironment.Enum_OsName.S2008 ||
-                        Program.OSEnvironment.OS_Name == OSEnvironment.Enum_OsName.S2008R2 ||
-                        Program.OSEnvironment.OS_Name == OSEnvironment.Enum_OsName.Vista ||
-                        Program.OSEnvironment.OS_Name == OSEnvironment.Enum_OsName.Win7)
+                    if (OSEnvironment.OS_Name == OSEnvironment.Enum_OsName.S2008 ||
+                        OSEnvironment.OS_Name == OSEnvironment.Enum_OsName.S2008R2 ||
+                        OSEnvironment.OS_Name == OSEnvironment.Enum_OsName.Vista ||
+                        OSEnvironment.OS_Name == OSEnvironment.Enum_OsName.Win7)
                     {
                         TurnOnRecovery();
                         Log("System crash recovery option is enabled");
@@ -380,6 +233,7 @@ namespace Com.Eucalyptus.Windows
             }
             else if (opt == "--xenpv")
             {
+                /// The support for XENPV drivers is deprecated
                 string dir = null;
                 if (args.Length >= 2)
                     dir = args[1];
@@ -858,69 +712,41 @@ namespace Com.Eucalyptus.Windows
             }
         }
 
-        // this directory path is based on Virtio driver version 1.1.11-0
+        // the directory path is based on Virtio driver version 0.1-59 (Apr 2013)
         static private void InstallVirtIODrivers(string baseDir)        
         {
             if (!Directory.Exists(baseDir))
                 throw new Exception(string.Format("Can't find the driver directory ({0})", baseDir));
 
-            /// determine O/S, 32/64bit
-            /// 
             OSEnvironment.Enum_OsName osName = OSEnvironment.OS_Name;
             bool is64bit = OSEnvironment.Is64bit;
 
-            // first check NetKVM directory exists
-            string netDir = baseDir+"\\NetKVM";
-            if (osName == OSEnvironment.Enum_OsName.XP || osName == OSEnvironment.Enum_OsName.S2003 || osName == OSEnvironment.Enum_OsName.S2003R2)
-                netDir += "\\XP";
-            else if (osName == OSEnvironment.Enum_OsName.Vista || osName == OSEnvironment.Enum_OsName.S2008 || osName == OSEnvironment.Enum_OsName.Win7 || osName == OSEnvironment.Enum_OsName.S2008R2)
-                netDir += "\\Vista";
-            else
-                throw new Exception("OS type can't be determined");
-            
-            if (is64bit)
-                netDir += "\\amd64";
-            else
-                netDir += "\\x86";
-              
-            if (!Directory.Exists(netDir))
-                throw new Exception(string.Format("Can't find the VirtIO Net driver directory({0})", netDir));
-
-            string storDir = baseDir + "\\viostor";
+            // resolve OS
+            string virtioDir = baseDir;
             if (osName == OSEnvironment.Enum_OsName.XP)
-                storDir += "\\WXp\\x86"; // there's  no AMD64 directory ==> should check against 64bit XP
+                virtioDir += "\\WXP"; // there's  no AMD64 directory ==> should check against 64bit XP
             else if (osName == OSEnvironment.Enum_OsName.S2003 || osName == OSEnvironment.Enum_OsName.S2003R2)
-            {
-                storDir += "\\Wnet";
-                if (is64bit)
-                    storDir += "\\amd64";
-                else
-                    storDir += "\\x86";
-            }
+                virtioDir += "\\WNET";
             else if (osName == OSEnvironment.Enum_OsName.Vista || osName == OSEnvironment.Enum_OsName.S2008)
-            {
-                storDir += "\\Wlh";
-                if (is64bit)
-                    storDir += "\\amd64";
-                else
-                    storDir += "\\x86";
-            }
+                virtioDir += "\\WLH";
             else if (osName == OSEnvironment.Enum_OsName.Win7 || osName == OSEnvironment.Enum_OsName.S2008R2)
-            {
-                storDir += "\\win7";
-                if (is64bit)
-                    storDir += "\\amd64";
-                else
-                    storDir += "\\x86";
-            }
+                virtioDir += "\\WIN7";
+            else if (osName == OSEnvironment.Enum_OsName.Win8 || osName == OSEnvironment.Enum_OsName.S2012)
+                virtioDir += "\\WIN8";
             else
                 throw new Exception("OS type can't be determined");
+           
+            // resolve 64/32 bit
+            if (is64bit)
+                virtioDir += "\\AMD64";
+            else
+                virtioDir += "\\X86";
 
-            if (!Directory.Exists(storDir))
-                throw new Exception(string.Format("Can't find the VirtIO storage driver directory({0})", storDir));
+            if (!Directory.Exists(virtioDir))
+                throw new Exception(string.Format("Can't find the VirtIO driver directory({0})", virtioDir));
 
             // this call may throw an exception if failed
-            DriverManager.Instance.InstallDrivers(new string[]{netDir, storDir});           
+            DriverManager.Instance.InstallDrivers(new string[]{virtioDir});           
         }
 
         // clean up any files upon uninstallation of Eucalyptus package
@@ -1071,10 +897,10 @@ namespace Com.Eucalyptus.Windows
                 return false;
 
             // compare size of inf file
-            string[] srcInfs = Directory.GetFiles(src, "*.inf");
+            string[] srcInfs = Directory.GetFiles(src, "*.INF");
             if (srcInfs == null || srcInfs.Length == 0)
                 return true;    // if there's no INF in the source, we think driver exists
-            string[] destInfs = Directory.GetFiles(dest, "*.inf");
+            string[] destInfs = Directory.GetFiles(dest, "*.INF");
             if (destInfs == null || destInfs.Length == 0)
                 return false;
 
@@ -1112,7 +938,6 @@ namespace Com.Eucalyptus.Windows
 
         public void InstallDrivers(string[] dirs)
         {
-            string infFile = null;
             foreach (string dir in dirs)
             {
                 try
@@ -1120,33 +945,32 @@ namespace Com.Eucalyptus.Windows
 #if EUCA_DEBUG
                     LogTools.Debug(string.Format("Attemping to install driver {0}", dir));
 #endif
-                    string[] infs = Directory.GetFiles(dir, "*.inf");
+                    string[] infs = Directory.GetFiles(dir, "*.INF");
                     if (infs == null || infs.Length == 0)
                     {
                         Program.Log(string.Format("Can't find 'inf' file in {0}", dir));
                         continue;
                     }
-                    if (infs.Length > 1)
-                        Program.Log(string.Format("[WARNING] There are more than one 'inf' files in {0}", dir));
-                    infFile = infs[0];
-
-                    StringBuilder destFile = new StringBuilder(MAX_PATH);
-                    int reqSize = 0;
-                    StringBuilder destinationInfFileNameComponent = new StringBuilder();
-                    bool copied = SetupCopyOEMInf(infFile, null, OemSourceMediaType.SPOST_PATH,
-                        OemCopyStyle.SP_COPY_NOOVERWRITE | OemCopyStyle.SP_COPY_FORCE_IN_USE,
-                        destFile, MAX_PATH, ref reqSize, destinationInfFileNameComponent);
-
-                    if (copied)
-                          Program.Log( string.Format("The driver({0}) succesfully installed", infFile));
-                    else
+                    foreach (string infFile in infs)
                     {
-                        int errCode = GetLastError();
-                        if (errCode == ERROR_FILE_EXISTS)
-                            Program.Log(string.Format("The driver({0}) already found in the system", infFile));                                        
+                        StringBuilder destFile = new StringBuilder(MAX_PATH);
+                        int reqSize = 0;
+                        StringBuilder destinationInfFileNameComponent = new StringBuilder();
+                        bool copied = SetupCopyOEMInf(infFile, null, OemSourceMediaType.SPOST_PATH,
+                            OemCopyStyle.SP_COPY_NOOVERWRITE | OemCopyStyle.SP_COPY_FORCE_IN_USE,
+                            destFile, MAX_PATH, ref reqSize, destinationInfFileNameComponent);
+
+                        if (copied)
+                            Program.Log(string.Format("The driver({0}) succesfully installed", infFile));
                         else
                         {
-                            throw new Exception(string.Format("SetupCopyOEMInf on {0} returned error code ({1})", infFile, errCode));
+                            int errCode = GetLastError();
+                            if (errCode == ERROR_FILE_EXISTS)
+                                Program.Log(string.Format("The driver({0}) already found in the system", infFile));
+                            else
+                            {
+                                throw new Exception(string.Format("SetupCopyOEMInf on {0} returned error code ({1})", infFile, errCode));
+                            }
                         }
                     }
                 }

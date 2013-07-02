@@ -1,5 +1,5 @@
 ﻿/*************************************************************************
- * Copyright 2010-2012 Eucalyptus Systems, Inc.
+ * Copyright 2010-2013 Eucalyptus Systems, Inc.
  *
  * Redistribution and use of this software in source and binary forms,
  * with or without modification, are permitted provided that the following
@@ -33,7 +33,7 @@ namespace Com.Eucalyptus
 {
     public class OSEnvironment
     {
-        public enum Enum_OsName { XP, Vista, Win7, S2003, S2003R2, S2008, S2008R2, NOTYETDETERMINED, UNKNOWN }
+        public enum Enum_OsName { XP, Vista, Win7, S2003, S2003R2, S2008, S2008R2, Win8, S2012, NOTYETDETERMINED, UNKNOWN }
 
         private static Enum_OsName _osName = Enum_OsName.NOTYETDETERMINED;
         public static Enum_OsName OS_Name
@@ -77,6 +77,14 @@ namespace Com.Eucalyptus
                         else if (osName.Contains("Vista"))
                         {
                             _osName = Enum_OsName.Vista;
+                        }
+                        else if (osName.Contains("2012"))
+                        {
+                            _osName = Enum_OsName.S2012;
+                        }
+                        else if (osName.Contains("Windows 8"))
+                        {
+                            _osName = Enum_OsName.Win8;
                         }
                         else
                             _osName = Enum_OsName.UNKNOWN;
