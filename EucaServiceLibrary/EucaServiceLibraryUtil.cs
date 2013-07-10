@@ -217,7 +217,7 @@ namespace Com.Eucalyptus.Windows
                 return;
             try
             {
-                Com.Eucalyptus.EucaUtil.SetRegistryValue(Registry.LocalMachine,
+                Com.Eucalyptus.SystemsUtil.SetRegistryValue(Registry.LocalMachine,
                     new string[] { "SOFTWARE", "Eucalyptus Systems", "Eucalyptus" }, key, value, false);
             }
             catch (Exception e)
@@ -232,7 +232,7 @@ namespace Com.Eucalyptus.Windows
                 return;
             try
             {
-                Com.Eucalyptus.EucaUtil.DeleteRegistryValue(Registry.LocalMachine,
+                Com.Eucalyptus.SystemsUtil.DeleteRegistryValue(Registry.LocalMachine,
                     new string[] { "SOFTWARE", "Eucalyptus Systems", "Eucalyptus" }, key);
             }
             catch (Exception e)
@@ -248,7 +248,7 @@ namespace Com.Eucalyptus.Windows
                 return null;
             try
             {
-                return Com.Eucalyptus.EucaUtil.GetRegistryValue(Registry.LocalMachine,
+                return Com.Eucalyptus.SystemsUtil.GetRegistryValue(Registry.LocalMachine,
                     new string[] { "SOFTWARE", "Eucalyptus Systems", "Eucalyptus" }, key);
             }
             catch (Exception e)

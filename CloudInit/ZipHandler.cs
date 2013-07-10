@@ -26,19 +26,16 @@
  ************************************************************************/
 using System;
 using System.Collections.Generic;
-//using System.Linq;
+using System.Linq;
 using System.Text;
 
-namespace Com.Eucalyptus
+namespace Com.Eucalyptus.Windows
 {
-    public class EucaConstant
+    class ZipHandler : UserDataHandler
     {
-        public const string EucalyptusNamespace = "http://www.eucalyptus.com"; 
-        public const string dummy = "m+1eSOgk8tYU5Y4gUfk75rzL9y6/TK06a4FHkJBM/CI=";
-        public const string dummyV = "Swqt3fqaSBj8gIbiZbrQDQ==";
-        //public const string UserDataUrl = "http://169.254.169.254/latest/user-data/";
-        public const string UserDataUrl = "http://ec2-54-214-191-197.us-west-2.compute.amazonaws.com/static/user-data";
-
-
+        override protected void Handle()
+        {
+            EucaLogger.Debug("Zip file handler");
+        }
     }
 }

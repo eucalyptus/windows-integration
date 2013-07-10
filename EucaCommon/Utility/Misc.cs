@@ -28,9 +28,62 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Management;
+using System.IO;
+using ICSharpCode.SharpZipLib.Zip;
+using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
+
 
 namespace Com.Eucalyptus
 {
+
+    public class EucaFileUtil
+    {
+        public static bool Unzip(string baseDir, string filepath)
+        {
+            string origDir = Directory.GetCurrentDirectory();
+            Directory.SetCurrentDirectory(baseDir);
+            using (ZipInputStream s = new ZipInputStream(File.OpenRead(filepath)))
+            {
+                ZipEntry theEntry;
+                while ((theEntry = s.GetNextEntry()) != null)
+                {	
+                    string directoryName = Path.GetDirectoryName(theEntry.Name);
+                    string fileName = Path.GetFileName(theEntry.Name);
+
+                    // create directory
+                    if (directoryName.Length > 0)
+                    {
+                        Directory.CreateDirectory(directoryName);
+                    }
+
+                    if (fileName != String.Empty)
+                    {
+                        using (FileStream streamWriter = File.Create(theEntry.Name))
+                        {
+
+                            int size = 2048;
+                            byte[] data = new byte[2048];
+                            while (true)
+                            {
+                                size = s.Read(data, 0, data.Length);
+                                if (size > 0)
+                                {
+                                    streamWriter.Write(data, 0, size);
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            Directory.SetCurrentDirectory(origDir);
+            return true;
+        }
+    }
+
     public class OSEnvironment
     {
         public enum Enum_OsName { XP, Vista, Win7, S2003, S2003R2, S2008, S2008R2, Win8, S2012, NOTYETDETERMINED, UNKNOWN }

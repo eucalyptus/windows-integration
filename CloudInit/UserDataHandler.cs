@@ -24,21 +24,67 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ************************************************************************/
+
 using System;
 using System.Collections.Generic;
-//using System.Linq;
+using System.Linq;
 using System.Text;
+using System.IO;
 
-namespace Com.Eucalyptus
+namespace Com.Eucalyptus.Windows
 {
-    public class EucaConstant
+    abstract class UserDataHandler
     {
-        public const string EucalyptusNamespace = "http://www.eucalyptus.com"; 
-        public const string dummy = "m+1eSOgk8tYU5Y4gUfk75rzL9y6/TK06a4FHkJBM/CI=";
-        public const string dummyV = "Swqt3fqaSBj8gIbiZbrQDQ==";
-        //public const string UserDataUrl = "http://169.254.169.254/latest/user-data/";
-        public const string UserDataUrl = "http://ec2-54-214-191-197.us-west-2.compute.amazonaws.com/static/user-data";
+        private List<String> _lines = null;
+        protected List<String> Lines
+        {
+            get
+            {
+                if (_lines == null)
+                {
+                    try
+                    {
+                        _lines = new List<string>();
+                        using (StreamReader sr = new StreamReader(File.OpenRead(_userDataFile)))
+                        {
+                            String line = null;
+                            while ((line = sr.ReadLine()) != null)
+                            {
+                                line = line.Trim();
+                                if(line.Length>0)
+                                    _lines.Add(line);
+                            }
+
+                        }
+                        return _lines;
+                    }
+                    catch (Exception ex)
+                    {
+                        _lines = null;
+                        return _lines;
+                    }
+                }
+                else
+                    return _lines;
+            }
+        }
+
+        private String _userDataFile=null;
+        protected String UserDataFile
+        {
+            get
+            {
+                return _userDataFile;
+            }
+        }
 
 
+        public void HandleUserData(String userDataFile)
+        {
+            this._userDataFile = userDataFile;
+            this.Handle();
+        }
+
+        abstract protected void Handle();
     }
 }

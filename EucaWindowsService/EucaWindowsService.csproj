@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>EucaWindowsService</RootNamespace>
     <AssemblyName>EucaWindowsService</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -78,10 +78,6 @@
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\SharpZipLib_0860\net-20\ICSharpCode.SharpZipLib.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Data" />
@@ -105,6 +101,10 @@
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\EucaCommon\Utility\EucaCommon.csproj">
+      <Project>{0DD04696-FBCD-4F70-BEA6-BF9B147F78FE}</Project>
+      <Name>EucaCommon</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EucaServiceLibrary\EucaServiceLibrary.csproj">
       <Project>{A0597B9F-13DE-4313-BEF3-99E923FA8B0D}</Project>
       <Name>EucaServiceLibrary</Name>

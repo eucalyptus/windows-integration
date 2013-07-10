@@ -26,19 +26,55 @@
  ************************************************************************/
 using System;
 using System.Collections.Generic;
-//using System.Linq;
+using System.Linq;
 using System.Text;
-
-namespace Com.Eucalyptus
+using System.IO;
+namespace Com.Eucalyptus.Windows
 {
-    public class EucaConstant
+    public class CloudInit
     {
-        public const string EucalyptusNamespace = "http://www.eucalyptus.com"; 
-        public const string dummy = "m+1eSOgk8tYU5Y4gUfk75rzL9y6/TK06a4FHkJBM/CI=";
-        public const string dummyV = "Swqt3fqaSBj8gIbiZbrQDQ==";
-        //public const string UserDataUrl = "http://169.254.169.254/latest/user-data/";
-        public const string UserDataUrl = "http://ec2-54-214-191-197.us-west-2.compute.amazonaws.com/static/user-data";
+        internal const String CloudInitDirectory = "C:\\Scratch";
+        public void Init()
+        {
+            string userDataFile = null;
+            try
+            {
+                userDataFile = CloudInit.CloudInitDirectory + "\\user-data";
+                EucaUtil.GetUserData(userDataFile);
+                if (!File.Exists(userDataFile))
+                    throw new EucaException("User data file not found");
+                if ((new FileInfo(userDataFile)).Length <= 0)
+                    throw new EucaException("Invalid user data file");
 
+            }
+            catch (Exception ex)
+            {
+                EucaLogger.Debug("Unable to download the user-data");
+                throw ex;
+            }
 
+            // detect the contents
+            UserDataHandler handler = null;
+            try
+            {
+                handler = UserDataHandlerFactory.Instance.GetHandler(userDataFile);
+            }
+            catch (Exception ex)
+            {
+                EucaLogger.Debug(String.Format("Unable to find the handler for matching user-data contents: {0}", ex));
+                return;
+            }
+            // invoke handler
+            try
+            {
+                handler.HandleUserData(userDataFile);
+            }
+            catch (Exception e)
+            {
+                EucaLogger.Debug("User data handler threw exception");
+                EucaLogger.Debug(e.ToString());
+            }
+            // return
+        }
     }
 }
