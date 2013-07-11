@@ -29,14 +29,64 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
+using System.IO;
 namespace Com.Eucalyptus.Windows
 {
     class IncludeHandler : UserDataHandler
     {
+        /*
+         * <include> 
+         *    http://myhost/user-data1
+         *    http://myhost/user-data2
+         * </include>
+         * 
+         */
         override protected void Handle()
         {
-            EucaLogger.Debug("Include handler");
+            var urls = this.AsMultiLinesWithoutTag;
+            var validUrls = urls.Where(url =>
+                url.ToLower().StartsWith("http://"));
+            List<String> localUserData = new List<String>();
+            foreach (String url in validUrls)
+            {
+                String filePath = String.Format("{0}\\{1}.txt",
+                    CloudInit.CloudInitDirectory, Guid.NewGuid().ToString().Substring(0, 8));
+                try{
+                    EucaUtil.Curl(url, filePath);
+                    localUserData.Add(filePath);
+                }catch(Exception ex){
+                    EucaLogger.Error(String.Format("Failed to download from the include url {0}",url));
+                    EucaLogger.Debug(ex.ToString());
+                    continue;
+                }
+            }
+
+            foreach (String userDataFile in localUserData)
+            {
+                UserDataHandler handler = null;
+                try
+                {
+                    handler = UserDataHandlerFactory.Instance.GetHandler(userDataFile);
+                }
+                catch (Exception ex)
+                {
+                    EucaLogger.Error("Unable to find the right handler for include file");
+                    EucaLogger.Debug(ex.ToString());
+                }
+
+                try
+                {
+                    handler.HandleUserData(userDataFile);
+                }
+                catch (Exception ex)
+                {
+                    EucaLogger.Error("Failed to handle the user data");
+                    EucaLogger.Debug(ex.ToString());
+                }
+            }
+
+            foreach (String userDataFile in localUserData)
+                File.Delete(userDataFile);
         }
     }
 }

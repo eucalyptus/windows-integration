@@ -47,7 +47,7 @@ namespace Com.Eucalyptus.Windows
                 else if (file.EndsWith(".ps1"))
                     ExecutePowershell(file);
                 else
-                    EucaLogger.Debug("Unknown file format found");
+                    EucaLogger.Error("Unknown file format found");
             }
         }
 
@@ -97,39 +97,11 @@ namespace Com.Eucalyptus.Windows
         const String ScriptFilesDir = CloudInit.CloudInitDirectory;
         private List<String> MakeScriptFragments()
         {
-            /*
-             * <script> do something </script> 
-             *  --> <script>
-             *      do something
-             *      </script>
-             */
-            List<String> formattedLines = new List<string>();
-            foreach (String s in Lines)
-            {
-                String line = s.Trim();
-                if (line.StartsWith("<script>", true, null) || line.StartsWith("<powershell>", true, null))
-                {
-                    String marker = line.Substring(0, line.IndexOf(">") + 1);
-                    line = line.Remove(0, line.IndexOf(">")+1);
-                    formattedLines.Add(marker);
-                }
-                if (line.EndsWith("</script>", true, null) || line.EndsWith("</powershell>", true, null))
-                {
-                    String marker = line.Substring(line.LastIndexOf("<"));
-                    line = line.Remove(line.LastIndexOf("<"));
-                    formattedLines.Add(line);
-                    formattedLines.Add(marker);
-                    line = null;
-                }
-                if (line != null && line.Length > 0)
-                    formattedLines.Add(line);
-            }
-
             List<String> scriptFiles = new List<string>();
 
             ParseState parser = ParseState.closed;
             List<String> contents = new List<string>();
-            foreach (String line in formattedLines)
+            foreach (String line in this.AsMultiLines)
             {
                 if (line.ToLower().Equals("<script>"))
                 {

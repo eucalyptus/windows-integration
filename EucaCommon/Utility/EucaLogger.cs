@@ -77,14 +77,14 @@ namespace Com.Eucalyptus
             Log(LOG_INFO, msg);
         }
 
-        public static void Fatal(string msg)
+        public static void Error(string msg)
         {
-            Instance.LogFatal(msg);
+            Instance.LogError(msg);
         }
 
-        public void LogFatal(String msg)
+        public void LogError(String msg)
         {
-            Log(LOG_FATAL, msg);
+            Log(LOG_ERROR, msg);
         }
 
         public static void Debug(string msg)
@@ -169,7 +169,7 @@ namespace Com.Eucalyptus
 #endif
                 break;
     			
-		    case LOG_FATAL:
+		    case LOG_ERROR:
 
                 //Console.WriteLine("CRITICAL: " + timedMsg);
 			    eucaMsg = string.Format("[{0}] [{1}] [{2}] {3}",
@@ -263,7 +263,7 @@ namespace Com.Eucalyptus
         }
         	
 	    public const int LOG_WARNING = 0;
-        public const int LOG_FATAL = 1;
+        public const int LOG_ERROR = 1;
         public const int LOG_INFO = 2;
         public const int LOG_DEBUG = 3;
         public const int LOG_DEVDEBUG= 4;

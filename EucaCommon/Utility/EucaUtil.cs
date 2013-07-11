@@ -38,10 +38,15 @@ namespace Com.Eucalyptus
     {
         public static void GetUserData(String fileToDownload)
         {
+            Curl(EucaConstant.UserDataUrl, fileToDownload);          
+        }
+        
+        public static void Curl(String url, String fileToDownload)
+        {
             try
             {
-                byte[] userData = GetUserData();
-                using(BinaryWriter bw = new BinaryWriter(File.Open(fileToDownload, FileMode.Create), Encoding.Default))
+                byte[] userData = Curl(url);
+                using (BinaryWriter bw = new BinaryWriter(File.Open(fileToDownload, FileMode.Create), Encoding.Default))
                 {
                     bw.Write(userData);
                 }
@@ -52,10 +57,10 @@ namespace Com.Eucalyptus
             }
         }
 
-        public static byte[] GetUserData()
+        public static byte[] Curl(String url)
         {
             HttpWebRequest httpReq =
-             (HttpWebRequest)WebRequest.Create(EucaConstant.UserDataUrl);
+             (HttpWebRequest)WebRequest.Create(url);
             HttpWebResponse response = (HttpWebResponse)httpReq.GetResponse();
             if (response.StatusCode != HttpStatusCode.OK)
             {

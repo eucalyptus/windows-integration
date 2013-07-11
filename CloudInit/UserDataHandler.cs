@@ -69,6 +69,55 @@ namespace Com.Eucalyptus.Windows
             }
         }
 
+        String[] STARTING_TAGS = { "<script>", "<powershell>", "<eucalyptus>", "<include>" };
+        String[] ENDING_TAGS = { "</script>", "</powershell>", "</eucalyptus>", "</include>" };
+              
+        protected IEnumerable<String> AsMultiLines
+        {
+            get
+            {
+                /*
+             * <script> do something </script> 
+             *  --> <script>
+             *      do something
+             *      </script>
+             */
+                List<String> formattedLines = new List<string>();
+                foreach (String s in Lines)
+                {
+                    String line = s.Trim();
+                    if (STARTING_TAGS.Where(tag => line.ToLower().StartsWith(tag)).Count() > 0)
+                    {
+                        String tag = line.Substring(0, line.IndexOf(">") + 1);
+                        line = line.Remove(0, line.IndexOf(">") + 1);
+                        formattedLines.Add(tag);
+                    }
+
+                    if (ENDING_TAGS.Where(tag => line.ToLower().EndsWith(tag)).Count() > 0)
+                    {
+                        String tag = line.Substring(line.LastIndexOf("<"));
+                        line = line.Remove(line.LastIndexOf("<"));
+                        formattedLines.Add(line);
+                        formattedLines.Add(tag);
+                        line = null;
+                    }
+                    if (line != null && line.Length > 0)
+                        formattedLines.Add(line);
+                }
+                return formattedLines;
+            }
+        }
+
+        protected IEnumerable<String> AsMultiLinesWithoutTag
+        {
+            get
+            {
+                return this.AsMultiLines
+                    .Where(line => !(STARTING_TAGS.Where(tag => tag.Equals(line.ToLower())).Any() ||
+                        (ENDING_TAGS.Where(tag => tag.Equals(line.ToLower())).Any())));
+            }
+        }
+
         private String _userDataFile=null;
         protected String UserDataFile
         {

@@ -29,14 +29,43 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.Win32;
 
 namespace Com.Eucalyptus.Windows
 {
     class EucalyptusParameterHandler : UserDataHandler
     {
+        /*
+         * <eucalyptus> 
+         * key1:value1
+         * key2:value2
+         * </eucalytpus>
+         * 
+         * <eucalyptus> key1:value1, key2:value2 </eucalyptus>
+         */
         override protected void Handle()
         {
-            EucaLogger.Debug("Euca parameter handler");
+            var keyValues = this.AsMultiLinesWithoutTag
+                .Where(line => line.Split(':').Length == 2)
+                .Select(line => new KeyValuePair<String, String>(line.Split(':')[0], line.Split(':')[1]));
+
+            foreach (var kv in keyValues)
+                SetEucaRegistryValue(kv.Key, kv.Value);
+        }
+
+        private void SetEucaRegistryValue(string key, object value)
+        {
+            if (key == null || value == null)
+                return;
+            try
+            {
+                Com.Eucalyptus.SystemsUtil.SetRegistryValue(Registry.LocalMachine,
+                    new string[] { "SOFTWARE", "Eucalyptus Systems", "Eucalyptus" }, key, value, false);
+            }
+            catch (Exception e)
+            {
+                EucaLogger.Exception("Could not set registry value", e);
+            }
         }
     }
 }
