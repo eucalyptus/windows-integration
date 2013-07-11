@@ -28,6 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 
 namespace Com.Eucalyptus.Windows
 {
@@ -35,58 +36,158 @@ namespace Com.Eucalyptus.Windows
     {
         override protected void Handle()
         {
-            EucaLogger.Debug("Script Handler invoked");
-            List<String> cmdLines = new List<string>();
+            EucaLogger.Debug("Script/Powershell Handler invoked");
+            
+            List<String> scripts = MakeScriptFragments();
+
+            foreach (String file in scripts)
+            {
+                if (file.EndsWith(".cmd"))
+                    ExecuteCommandLine(file);
+                else if (file.EndsWith(".ps1"))
+                    ExecutePowershell(file);
+                else
+                    EucaLogger.Debug("Unknown file format found");
+            }
+        }
+
+        private void ExecuteCommandLine(String scriptFile)
+        {
+            String exec = "cmd.exe";
+            String args = String.Format("/c {0}", scriptFile);
+
+            EucaLogger.Debug(String.Format("Executing {0} {1}", exec, args));
+            try
+            {
+                Win32_CommandResult result = SystemsUtil.SpawnProcessAndWait(exec, args);
+                EucaLogger.Debug(String.Format("Execution finished with exit code={0}", result.ExitCode));
+                EucaLogger.Debug(String.Format("Stdout: {0}", result.Stdout));
+                EucaLogger.Debug(String.Format("Stderr: {0}", result.Stderr));
+            }
+            catch (Exception ex)
+            {
+                EucaLogger.Debug("Execution failed");
+                EucaLogger.Debug(ex.ToString());
+            }
+        }
+
+        private void ExecutePowershell(String powershellFile)
+        {
+            String exec = "powershell.exe";
+            String args = String.Format("-NonInteractive -File {0}", powershellFile);
+            EucaLogger.Debug(String.Format("Executing {0} {1}", exec, args));
+            try
+            {
+                Win32_CommandResult result = SystemsUtil.SpawnProcessAndWait(exec, args);
+                EucaLogger.Debug(String.Format("Execution finished with exit code={0}", result.ExitCode));
+                EucaLogger.Debug(String.Format("Stdout: {0}", result.Stdout));
+                EucaLogger.Debug(String.Format("Stderr: {0}", result.Stderr));
+            }
+            catch (Exception ex)
+            {
+                EucaLogger.Debug("Execution failed");
+                EucaLogger.Debug(ex.ToString());
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns> the list of file paths that contains the script/powershell </returns>
+        enum ParseState { script_open, powershell_open, closed };
+        const String ScriptFilesDir = CloudInit.CloudInitDirectory;
+        private List<String> MakeScriptFragments()
+        {
+            /*
+             * <script> do something </script> 
+             *  --> <script>
+             *      do something
+             *      </script>
+             */
+            List<String> formattedLines = new List<string>();
             foreach (String s in Lines)
             {
-                String cmdLine = s.Trim();
-                if (cmdLine.ToLower().StartsWith("<script>"))
-                   cmdLine = cmdLine.Remove(0, "<script>".Length);
-                bool endOfScript = false;
-                if (cmdLine.ToLower().EndsWith("</script>"))
+                String line = s.Trim();
+                if (line.StartsWith("<script>", true, null) || line.StartsWith("<powershell>", true, null))
                 {
-                    cmdLine = cmdLine.Remove(cmdLine.Length - "<script>".Length, "<script>".Length);
-                    endOfScript = true;
+                    String marker = line.Substring(0, line.IndexOf(">") + 1);
+                    line = line.Remove(0, line.IndexOf(">")+1);
+                    formattedLines.Add(marker);
                 }
-                if(cmdLine.Length>0)
-                    cmdLines.Add(cmdLine);
-                if (endOfScript)
-                    break;
+                if (line.EndsWith("</script>", true, null) || line.EndsWith("</powershell>", true, null))
+                {
+                    String marker = line.Substring(line.LastIndexOf("<"));
+                    line = line.Remove(line.LastIndexOf("<"));
+                    formattedLines.Add(line);
+                    formattedLines.Add(marker);
+                    line = null;
+                }
+                if (line != null && line.Length > 0)
+                    formattedLines.Add(line);
             }
 
-            ExecuteAll(cmdLines);
-        }
+            List<String> scriptFiles = new List<string>();
 
-        private void ExecuteAll(List<String> cmdLines)
-        {
-            EucaLogger.Debug(string.Format("Starting to execute {0} command lines", cmdLines.Count));
-
-            foreach (String cmdLine in cmdLines)
+            ParseState parser = ParseState.closed;
+            List<String> contents = new List<string>();
+            foreach (String line in formattedLines)
             {
-                String[] parts = cmdLine.Split(null);
-                if (parts.Length <= 0)
+                if (line.ToLower().Equals("<script>"))
                 {
-                    EucaLogger.Debug(String.Format("Unable to parse command line: {0}", cmdLine));
-                    continue;
+                    if (parser != ParseState.closed)
+                        throw new EucaException(String.Format("Malformed script: {0}", line));
+                    parser = ParseState.script_open;
+                    contents.Clear();
                 }
-                String exec = parts[0];
-                String args = null;
-                if (parts.Length > 1)
-                   args = String.Join(" ", parts, 1, parts.Length - 1);
-                EucaLogger.Debug(String.Format("Executing {0} {1}", exec, args));
-                try
+                else if (line.ToLower().Equals("<powershell>"))
                 {
-                    Win32_CommandResult result = SystemsUtil.SpawnProcessAndWait(exec, args);
-                    EucaLogger.Debug(String.Format("Execution finished with exit code={0}", result.ExitCode));
+                    if (parser != ParseState.closed)
+                        throw new EucaException(String.Format("Malformed script: {0}", line));
+                    parser = ParseState.powershell_open;
+                    contents.Clear();
                 }
-                catch (Exception ex)
+                else if (line.ToLower().Equals("</script>"))
                 {
-                    EucaLogger.Debug("Execution failed");
-                    EucaLogger.Debug(ex.ToString());
+                    if (parser != ParseState.script_open)
+                        throw new EucaException(String.Format("Malformed script: {0}", line));
+                    parser = ParseState.closed;
+                    /// create the scripts file
+                    String filePath = String.Format("{0}\\{1}.cmd", ScriptFilesDir,
+                        Guid.NewGuid().ToString().Substring(0, 8));
+                    WriteScriptFile(contents, filePath);
+                    scriptFiles.Add(filePath);
+                }
+                else if (line.ToLower().Equals("</powershell>"))
+                {
+                    if (parser != ParseState.powershell_open)
+                        throw new EucaException(String.Format("Malformed script: {0}", line));
+                    parser = ParseState.closed;
+                    /// crate the powershell file
+                    /// 
+                    String filePath = String.Format("{0}\\{1}.ps1", ScriptFilesDir,
+                        Guid.NewGuid().ToString().Substring(0, 8));
+                    WriteScriptFile(contents, filePath);
+                    scriptFiles.Add(filePath);
+                }
+                else
+                {
+                    String cmd = line.Trim();
+                    if (cmd.Length > 0)
+                        contents.Add(cmd);
                 }
             }
 
+            return scriptFiles;
         }
-
+        private void WriteScriptFile(List<String> lines, String filePath)
+        {
+            using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+            {
+                using (StreamWriter sw = new StreamWriter(fs))
+                {
+                    foreach (String line in lines)
+                        sw.WriteLine(line);
+                }
+            }
+        }
     }
 }

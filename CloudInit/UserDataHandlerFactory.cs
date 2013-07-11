@@ -74,10 +74,8 @@ namespace Com.Eucalyptus.Windows
                         if (line.Length > 0)
                         {
                             line = line.ToLower();
-                            if (line.StartsWith("<script>"))
+                            if (line.StartsWith("<script>") || line.StartsWith("<powershell>"))
                                 dataHandler = new ScriptHandler();
-                            else if (line.StartsWith("<powershell>"))
-                                dataHandler = new PowershellHandler();
                             else if (line.StartsWith("<eucalyptus>"))
                                 dataHandler = new EucalyptusParameterHandler();
                             else if (line.StartsWith("<include>"))
