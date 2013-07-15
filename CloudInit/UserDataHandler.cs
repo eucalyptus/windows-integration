@@ -125,12 +125,16 @@ namespace Com.Eucalyptus.Windows
             {
                 return _userDataFile;
             }
+            private set
+            {
+                _userDataFile = value;
+            }
         }
 
 
         public void HandleUserData(String userDataFile)
         {
-            this._userDataFile = userDataFile;
+            this.UserDataFile = userDataFile;
             this.Handle();
         }
 

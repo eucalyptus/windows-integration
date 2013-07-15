@@ -61,7 +61,7 @@ namespace Com.Eucalyptus.Windows
             }
             catch (Exception ex)
             {
-                EucaLogger.Debug(String.Format("Unable to find the handler for matching user-data contents: {0}", ex));
+                EucaLogger.Exception("Unable to find the handler for matching user-data contents", ex);
                 return;
             }
             // invoke handler
@@ -71,8 +71,7 @@ namespace Com.Eucalyptus.Windows
             }
             catch (Exception e)
             {
-                EucaLogger.Debug("User data handler threw exception");
-                EucaLogger.Debug(e.ToString());
+                EucaLogger.Exception("User data handler threw exception", e);
             }
             // return
         }

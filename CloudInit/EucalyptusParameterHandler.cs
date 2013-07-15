@@ -50,7 +50,17 @@ namespace Com.Eucalyptus.Windows
                 .Select(line => new KeyValuePair<String, String>(line.Split(':')[0], line.Split(':')[1]));
 
             foreach (var kv in keyValues)
-                SetEucaRegistryValue(kv.Key, kv.Value);
+            {
+                try
+                {
+                    SetEucaRegistryValue(kv.Key, kv.Value);
+                    EucaLogger.Debug(String.Format("Eucalyptus registry updated: {0}-{1}", kv.Key, kv.Value)); 
+                }
+                catch (Exception e)
+                {
+                    EucaLogger.Exception("Could not set registry value", e);
+                }
+            }
         }
 
         private void SetEucaRegistryValue(string key, object value)
@@ -60,11 +70,11 @@ namespace Com.Eucalyptus.Windows
             try
             {
                 Com.Eucalyptus.SystemsUtil.SetRegistryValue(Registry.LocalMachine,
-                    new string[] { "SOFTWARE", "Eucalyptus Systems", "Eucalyptus" }, key, value, false);
+                    new string[] { "SOFTWARE", "Eucalyptus Systems", "Eucalyptus" }, key, value, true);
             }
             catch (Exception e)
             {
-                EucaLogger.Exception("Could not set registry value", e);
+                throw e;
             }
         }
     }

@@ -38,10 +38,12 @@ namespace Com.Eucalyptus
 
     public class EucaFileUtil
     {
-        public static bool Unzip(string baseDir, string filepath)
+        public static String[] Unzip(string baseDir, string filepath)
         {
             string origDir = Directory.GetCurrentDirectory();
             Directory.SetCurrentDirectory(baseDir);
+
+            List<String> createdFiles = new List<String>();
             using (ZipInputStream s = new ZipInputStream(File.OpenRead(filepath)))
             {
                 ZipEntry theEntry;
@@ -76,11 +78,12 @@ namespace Com.Eucalyptus
                                 }
                             }
                         }
+                        createdFiles.Add(theEntry.Name);
                     }
                 }
             }
             Directory.SetCurrentDirectory(origDir);
-            return true;
+            return createdFiles.ToArray();
         }
     }
 

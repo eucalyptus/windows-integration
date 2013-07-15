@@ -55,8 +55,7 @@ namespace Com.Eucalyptus.Windows
                     EucaUtil.Curl(url, filePath);
                     localUserData.Add(filePath);
                 }catch(Exception ex){
-                    EucaLogger.Error(String.Format("Failed to download from the include url {0}",url));
-                    EucaLogger.Debug(ex.ToString());
+                    EucaLogger.Exception(String.Format("Failed to download from the include url {0}", url), ex);
                     continue;
                 }
             }
@@ -70,8 +69,7 @@ namespace Com.Eucalyptus.Windows
                 }
                 catch (Exception ex)
                 {
-                    EucaLogger.Error("Unable to find the right handler for include file");
-                    EucaLogger.Debug(ex.ToString());
+                    EucaLogger.Exception("Unable to find the right handler for include file", ex);
                 }
 
                 try
@@ -80,8 +78,7 @@ namespace Com.Eucalyptus.Windows
                 }
                 catch (Exception ex)
                 {
-                    EucaLogger.Error("Failed to handle the user data");
-                    EucaLogger.Debug(ex.ToString());
+                    EucaLogger.Exception("Failed to handle the user data", ex);
                 }
             }
 

@@ -58,8 +58,12 @@ namespace Com.Eucalyptus.Windows
              */
             try
             {
-                tryDecompress(userDataFile, CloudInit.CloudInitDirectory);
-                return new ZipHandler();
+                String unzippedDir = String.Format("{0}\\unzipped", CloudInit.CloudInitDirectory);
+                if(Directory.Exists(unzippedDir))
+                    Directory.Delete(unzippedDir, true);
+                Directory.CreateDirectory(unzippedDir);
+                tryDecompress(userDataFile, unzippedDir);
+                return new ZipHandler(unzippedDir);
             }
             catch (Exception ex)
             {
@@ -92,9 +96,9 @@ namespace Com.Eucalyptus.Windows
             }
         }   
 
-        void tryDecompress(String userDataFile, String decompresssedDir)
+        void tryDecompress(String userDataFile, String unzippedDir)
         {
-            EucaFileUtil.Unzip(decompresssedDir, userDataFile);
+            EucaFileUtil.Unzip(unzippedDir, userDataFile);
         }
     }
 }

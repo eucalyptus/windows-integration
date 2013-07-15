@@ -66,8 +66,7 @@ namespace Com.Eucalyptus.Windows
             }
             catch (Exception ex)
             {
-                EucaLogger.Debug("Execution failed");
-                EucaLogger.Debug(ex.ToString());
+                EucaLogger.Exception("Execution failed", ex);
             }
         }
 
@@ -85,8 +84,7 @@ namespace Com.Eucalyptus.Windows
             }
             catch (Exception ex)
             {
-                EucaLogger.Debug("Execution failed");
-                EucaLogger.Debug(ex.ToString());
+                EucaLogger.Exception("Execution failed", ex);
             }
         }
         /// <summary>
