@@ -511,7 +511,8 @@ namespace Com.Eucalyptus.Windows
                     else
                         answerPath += "answer_server2008_x86.xml";
                 }
-                else if (OSEnvironment.OS_Name == OSEnvironment.Enum_OsName.S2008R2)
+                else if (OSEnvironment.OS_Name == OSEnvironment.Enum_OsName.S2008R2 ||
+                    OSEnvironment.OS_Name == OSEnvironment.Enum_OsName.S2012)
                     answerPath += "answer_server2008r2_amd64.xml";
                 else if (OSEnvironment.OS_Name == OSEnvironment.Enum_OsName.Win7)
                 {
