@@ -369,7 +369,7 @@
         "InstallerBootstrapper" = "3:2"
             "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
             {
-            "Enabled" = "11:TRUE"
+            "Enabled" = "11:FALSE"
             "PromptEnabled" = "11:TRUE"
             "PrerequisitesLocation" = "2:2"
             "Url" = "8:"
@@ -1081,7 +1081,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Eucalyptus Windows Integration"
         "ProductCode" = "8:{9EFC65FF-7187-468C-B336-5EF818F95D43}"
-        "PackageCode" = "8:{09A8694E-30F8-413F-89F9-834D5E642B5D}"
+        "PackageCode" = "8:{B3FDF94D-0154-407C-B57B-DE182D55D1B9}"
         "UpgradeCode" = "8:{18E08644-D7EF-416F-82D3-5945775122C8}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
