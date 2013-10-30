@@ -36,8 +36,6 @@ using System.Runtime.InteropServices;
 using System.Management;
 using System.IO;
 using Microsoft.Win32;
-using ICSharpCode.SharpZipLib.Zip;
-using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 
 namespace Com.Eucalyptus.Windows.EucaWindowsService
 {
@@ -165,7 +163,7 @@ namespace Com.Eucalyptus.Windows.EucaWindowsService
                 {
                      if (File.Exists(xenPVFile))
                     {
-                        if (unzip(_installLocation, xenPVFile))
+                        if (EucaFileUtil.Unzip(_installLocation, xenPVFile))
                         {
                             ;
                         }
@@ -196,7 +194,7 @@ namespace Com.Eucalyptus.Windows.EucaWindowsService
                 {
                     if (File.Exists(virtioFile))
                     {
-                        if (unzip(_installLocation, virtioFile))
+                        if (EucaFileUtil.Unzip(_installLocation, virtioFile))
                         {
                             string[] paths = Directory.GetDirectories(virtioDir);
                             if (paths != null && paths.Length > 0)
@@ -244,52 +242,6 @@ namespace Com.Eucalyptus.Windows.EucaWindowsService
             }
         }
         
-        private bool unzip(string baseDir, string filepath)
-        {
-            string origDir = Directory.GetCurrentDirectory();
-            Directory.SetCurrentDirectory(baseDir);
-            using (ZipInputStream s = new ZipInputStream(File.OpenRead(filepath)))
-            {
-                ZipEntry theEntry;
-                while ((theEntry = s.GetNextEntry()) != null)
-                {
-                    //Console.WriteLine(theEntry.Name);			
-                    string directoryName = Path.GetDirectoryName(theEntry.Name);
-                    string fileName = Path.GetFileName(theEntry.Name);
-
-                    // create directory
-                    if (directoryName.Length > 0)
-                    {
-                        Directory.CreateDirectory(directoryName);
-                    }
-
-                    if (fileName != String.Empty)
-                    {
-                        using (FileStream streamWriter = File.Create(theEntry.Name))
-                        {
-
-                            int size = 2048;
-                            byte[] data = new byte[2048];
-                            while (true)
-                            {
-                                size = s.Read(data, 0, data.Length);
-                                if (size > 0)
-                                {
-                                    streamWriter.Write(data, 0, size);
-                                }
-                                else
-                                {
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            Directory.SetCurrentDirectory(origDir);
-            return true;
-        }
-
         private int LaunchEucaPostInstaller(string exe, string arg)
         {
             using (System.Diagnostics.Process proc = new System.Diagnostics.Process())

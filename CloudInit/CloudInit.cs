@@ -24,61 +24,56 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  ************************************************************************/
-
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
-using System.Net;
+using System.Text;
 using System.IO;
-
-namespace Com.Eucalyptus
+namespace Com.Eucalyptus.Windows
 {
-    public class EucaUtil
+    public class CloudInit
     {
-        public static void GetUserData(String fileToDownload)
+        internal const String CloudInitDirectory = "C:\\Scratch";
+        public void Init()
         {
-            Curl(EucaConstant.UserDataUrl, fileToDownload);          
-        }
-        
-        public static void Curl(String url, String fileToDownload)
-        {
+            string userDataFile = null;
             try
             {
-                byte[] userData = Curl(url);
-                using (BinaryWriter bw = new BinaryWriter(File.Open(fileToDownload, FileMode.Create), Encoding.Default))
-                {
-                    bw.Write(userData);
-                }
+                userDataFile = CloudInit.CloudInitDirectory + "\\user-data";
+                EucaUtil.GetUserData(userDataFile);
+                if (!File.Exists(userDataFile))
+                    throw new EucaException("User data file not found");
+                if ((new FileInfo(userDataFile)).Length <= 0)
+                    throw new EucaException("Invalid user data file");
+
+            }
+            catch (Exception ex)
+            {
+                EucaLogger.Debug("Unable to download the user-data");
+                throw ex;
+            }
+
+            // detect the contents
+            UserDataHandler handler = null;
+            try
+            {
+                handler = UserDataHandlerFactory.Instance.GetHandler(userDataFile);
+            }
+            catch (Exception ex)
+            {
+                EucaLogger.Exception("Unable to find the handler for matching user-data contents", ex);
+                return;
+            }
+            // invoke handler
+            try
+            {
+                handler.HandleUserData(userDataFile);
             }
             catch (Exception e)
             {
-                throw e;
+                EucaLogger.Exception("User data handler threw exception", e);
             }
+            // return
         }
-
-        public static byte[] Curl(String url)
-        {
-            HttpWebRequest httpReq =
-             (HttpWebRequest)WebRequest.Create(url);
-            HttpWebResponse response = (HttpWebResponse)httpReq.GetResponse();
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                throw new EucaException("Invalid response code from server: " + response.StatusCode);
-            }
-            Stream stream = response.GetResponseStream();
-            byte[] data = null;
-            using (BinaryReader reader = new BinaryReader(stream))
-            {
-                data = reader.ReadBytes((int)response.ContentLength);
-            }
-            if (data != null && data.Length != response.ContentLength)
-            {
-                throw new EucaException("data length doesn't match");
-            }
-
-            return data;
-        }
-
     }
 }

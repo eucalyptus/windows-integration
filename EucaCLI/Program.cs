@@ -118,7 +118,7 @@ namespace Com.Eucalyptus.Windows
                         Console.WriteLine("EucaCLI: uname and passwd is null");
                         return -1;
                     }
-                    string passwdEnc = EucaUtil.Encrypt(passwd);
+                    string passwdEnc = SystemsUtil.Encrypt(passwd);
 
                     EucaServiceLibraryUtil.SetSvcRegistryValue("ADUsername", uname);
                     EucaServiceLibraryUtil.SetSvcRegistryValue("ADPassword", passwdEnc);

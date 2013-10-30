@@ -27,58 +27,55 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
-using System.Net;
-using System.IO;
+using System.Text;
+using Microsoft.Win32;
 
-namespace Com.Eucalyptus
+namespace Com.Eucalyptus.Windows
 {
-    public class EucaUtil
+    class EucalyptusParameterHandler : UserDataHandler
     {
-        public static void GetUserData(String fileToDownload)
+        /*
+         * <eucalyptus> 
+         * key1:value1
+         * key2:value2
+         * </eucalytpus>
+         * 
+         * <eucalyptus> key1:value1, key2:value2 </eucalyptus>
+         */
+        override protected void Handle()
         {
-            Curl(EucaConstant.UserDataUrl, fileToDownload);          
+            var keyValues = this.AsMultiLinesWithoutTag
+                .Where(line => line.Split(':').Length == 2)
+                .Select(line => new KeyValuePair<String, String>(line.Split(':')[0], line.Split(':')[1]));
+
+            foreach (var kv in keyValues)
+            {
+                try
+                {
+                    SetEucaRegistryValue(kv.Key, kv.Value);
+                    EucaLogger.Debug(String.Format("Eucalyptus registry updated: {0}-{1}", kv.Key, kv.Value)); 
+                }
+                catch (Exception e)
+                {
+                    EucaLogger.Exception("Could not set registry value", e);
+                }
+            }
         }
-        
-        public static void Curl(String url, String fileToDownload)
+
+        private void SetEucaRegistryValue(string key, object value)
         {
+            if (key == null || value == null)
+                return;
             try
             {
-                byte[] userData = Curl(url);
-                using (BinaryWriter bw = new BinaryWriter(File.Open(fileToDownload, FileMode.Create), Encoding.Default))
-                {
-                    bw.Write(userData);
-                }
+                Com.Eucalyptus.SystemsUtil.SetRegistryValue(Registry.LocalMachine,
+                    new string[] { "SOFTWARE", "Eucalyptus Systems", "Eucalyptus" }, key, value, true);
             }
             catch (Exception e)
             {
                 throw e;
             }
         }
-
-        public static byte[] Curl(String url)
-        {
-            HttpWebRequest httpReq =
-             (HttpWebRequest)WebRequest.Create(url);
-            HttpWebResponse response = (HttpWebResponse)httpReq.GetResponse();
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                throw new EucaException("Invalid response code from server: " + response.StatusCode);
-            }
-            Stream stream = response.GetResponseStream();
-            byte[] data = null;
-            using (BinaryReader reader = new BinaryReader(stream))
-            {
-                data = reader.ReadBytes((int)response.ContentLength);
-            }
-            if (data != null && data.Length != response.ContentLength)
-            {
-                throw new EucaException("data length doesn't match");
-            }
-
-            return data;
-        }
-
     }
 }

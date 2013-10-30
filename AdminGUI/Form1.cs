@@ -21,7 +21,7 @@ namespace Com.Eucalyptus.Windows
         {
             try
             {
-                string installLocation = (string)EucaUtil.GetRegistryValue(Registry.LocalMachine, EUCALYPTUS_REGISTRY_PATH, "InstallLocation");
+                string installLocation = (string)SystemsUtil.GetRegistryValue(Registry.LocalMachine, EUCALYPTUS_REGISTRY_PATH, "InstallLocation");
                 EucaLogger.LogLocation = string.Format("{0}\\eucalog.txt", installLocation);
             }
             catch (Exception e)
@@ -74,7 +74,7 @@ namespace Com.Eucalyptus.Windows
             tmp = EucaServiceLibraryUtil.GetSvcRegistryValue("ADPassword");
             {
                 if (tmp != null)
-                    _adConfig.ADPassword = EucaUtil.Decrypt((string)tmp);
+                    _adConfig.ADPassword = SystemsUtil.Decrypt((string)tmp);
             }
             tmp = EucaServiceLibraryUtil.GetSvcRegistryValue("ADOU");
             if (tmp != null)
@@ -111,7 +111,7 @@ namespace Com.Eucalyptus.Windows
 
             try
             {
-                int selected = (int) EucaUtil.GetRegistryValue(Registry.LocalMachine, EUCALYPTUS_REGISTRY_PATH, "FormatDrives");
+                int selected = (int) SystemsUtil.GetRegistryValue(Registry.LocalMachine, EUCALYPTUS_REGISTRY_PATH, "FormatDrives");
                 if (selected == 1)
                     checkBoxFormatDrives.Checked = true;
                 else
@@ -177,7 +177,7 @@ namespace Com.Eucalyptus.Windows
             //encrypt AD password properly
             if (adPassword.Trim() != (string)EucaServiceLibraryUtil.GetSvcRegistryValue("ADPassword"))
             {
-                string data = EucaUtil.Encrypt(adPassword.Trim());
+                string data = SystemsUtil.Encrypt(adPassword.Trim());
                 EucaServiceLibraryUtil.SetSvcRegistryValue("ADPassword", data);
                 updated = true;
             }
@@ -483,9 +483,9 @@ namespace Com.Eucalyptus.Windows
             try
             {
                 if (formatDrive)
-                    EucaUtil.SetRegistryValue(Registry.LocalMachine, EUCALYPTUS_REGISTRY_PATH, "FormatDrives", 1, false);
+                    SystemsUtil.SetRegistryValue(Registry.LocalMachine, EUCALYPTUS_REGISTRY_PATH, "FormatDrives", 1, false);
                 else
-                    EucaUtil.SetRegistryValue(Registry.LocalMachine, EUCALYPTUS_REGISTRY_PATH, "FormatDrives", 0, false);
+                    SystemsUtil.SetRegistryValue(Registry.LocalMachine, EUCALYPTUS_REGISTRY_PATH, "FormatDrives", 0, false);
             }
             catch (Exception ie)
             {
@@ -497,7 +497,7 @@ namespace Com.Eucalyptus.Windows
             get
             {
                 string installLocation = (string)
-                    EucaUtil.GetRegistryValue(Registry.LocalMachine, EUCALYPTUS_REGISTRY_PATH, "InstallLocation");
+                    SystemsUtil.GetRegistryValue(Registry.LocalMachine, EUCALYPTUS_REGISTRY_PATH, "InstallLocation");
                 string answerPath = null;
                 if(installLocation.EndsWith("\\"))
                     answerPath = string.Format("{0}sysprep_answers\\", installLocation);
@@ -567,7 +567,7 @@ namespace Com.Eucalyptus.Windows
                 System.Diagnostics.Process proc = new System.Diagnostics.Process();
                 proc.StartInfo.UseShellExecute = true;
 
-                Win32_CommandResult result = EucaUtil.SpawnProcessAndWait(sysprepExec, arg);                
+                Win32_CommandResult result = SystemsUtil.SpawnProcessAndWait(sysprepExec, arg);                
                 if (result.ExitCode != 0)
                 {
                     MessageBox.Show(string.Format("Sysprep returned exit code: {0}", result.ExitCode));
@@ -598,7 +598,7 @@ namespace Com.Eucalyptus.Windows
                     MessageBox.Show(string.Format("Sysprep answer file is not found ({0})", answerPath));
                     return;
                 }
-                Win32_CommandResult result = EucaUtil.SpawnProcessAndWait("notepad.exe", answerPath);
+                Win32_CommandResult result = SystemsUtil.SpawnProcessAndWait("notepad.exe", answerPath);
             }
             catch (Exception ie) {
                 MessageBox.Show(string.Format("Unexpected exception thrown: {0}", ie.Message), "WARNING");

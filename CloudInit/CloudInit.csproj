@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{0DD04696-FBCD-4F70-BEA6-BF9B147F78FE}</ProjectGuid>
+    <ProjectGuid>{60446531-0D0B-4CB4-B1C3-69F3D5AB108D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Com.Eucalyptus</RootNamespace>
-    <AssemblyName>EucaCommon</AssemblyName>
+    <RootNamespace>Com.Eucalyptus.Windows</RootNamespace>
+    <AssemblyName>CloudInit</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -32,23 +32,40 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ICSharpCode.SharpZipLib">
-      <HintPath>..\..\SharpZipLib_0860\net-20\ICSharpCode.SharpZipLib.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Management" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EucaConstant.cs" />
-    <Compile Include="EucaException.cs" />
-    <Compile Include="EucaLogger.cs" />
-    <Compile Include="EucaUtil.cs" />
-    <Compile Include="SystemsUtil.cs" />
-    <Compile Include="IManagedThread.cs" />
-    <Compile Include="Misc.cs" />
+    <Compile Include="BogusHandler.cs" />
+    <Compile Include="CloudInit.cs" />
+    <Compile Include="EucalyptusParameterHandler.cs" />
+    <Compile Include="ZipHandler.cs" />
+    <Compile Include="IncludeHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="ScriptHandler.cs" />
+    <Compile Include="UserDataHandler.cs" />
+    <Compile Include="UserDataHandlerFactory.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EucaCommon\Utility\EucaCommon.csproj">
+      <Project>{0DD04696-FBCD-4F70-BEA6-BF9B147F78FE}</Project>
+      <Name>EucaCommon</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

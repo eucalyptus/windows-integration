@@ -85,7 +85,7 @@ namespace Com.Eucalyptus.Windows.EucaServiceLibrary
         {           
             try
             {
-                string installLocation = (string)EucaUtil.GetRegistryValue(Registry.LocalMachine, EucaRegistryPath, "InstallLocation");
+                string installLocation = (string)SystemsUtil.GetRegistryValue(Registry.LocalMachine, EucaRegistryPath, "InstallLocation");
                 EucaLogger.LogLocation = string.Format("{0}\\eucalog.txt", installLocation);
 
                 _configLocation = configFileLocation;
@@ -128,7 +128,7 @@ namespace Com.Eucalyptus.Windows.EucaServiceLibrary
         private static void RecordInstanceLaunch(Configuration eucaConfig)
         {
             /// location => C:\\program files\\
-            string installLocation = (string)EucaUtil.GetRegistryValue(Registry.LocalMachine, EucaRegistryPath, "InstallLocation");
+            string installLocation = (string)SystemsUtil.GetRegistryValue(Registry.LocalMachine, EucaRegistryPath, "InstallLocation");
             string instanceHistoryFile = string.Format("{0}\\{1}", installLocation, "instances");
 
             /// check if the hostname in the eucaConfig is in the instance history
@@ -208,7 +208,7 @@ namespace Com.Eucalyptus.Windows.EucaServiceLibrary
             // {
                 try
                 {
-                    int format = (int)EucaUtil.GetRegistryValue(
+                    int format = (int)SystemsUtil.GetRegistryValue(
                         Registry.LocalMachine, Bootstrapper.EucaRegistryPath, "FormatDrives");
                     if (format == 1)
                     {
@@ -783,7 +783,7 @@ namespace Com.Eucalyptus.Windows.EucaServiceLibrary
                         sw.Write(sbDiskPart.ToString());
                         sw.Flush();
                     }
-                    Win32_CommandResult result = EucaUtil.SpawnProcessAndWait("diskpart.exe", "/s C:\\diskpart.txt");
+                    Win32_CommandResult result = SystemsUtil.SpawnProcessAndWait("diskpart.exe", "/s C:\\diskpart.txt");
                     if (result.Stdout == null || !result.Stdout.Contains("successfully assigned the drive letter"))
                     {
                         StringBuilder sbLog = new StringBuilder();
@@ -828,7 +828,7 @@ namespace Com.Eucalyptus.Windows.EucaServiceLibrary
             List<string> assigned = new List<string>(10);
             try
             {
-                Win32_CommandResult result = EucaUtil.SpawnProcessAndWait("diskpart.exe", "/s C:\\diskpart.txt");
+                Win32_CommandResult result = SystemsUtil.SpawnProcessAndWait("diskpart.exe", "/s C:\\diskpart.txt");
                 if (result.ExitCode != 0)
                     throw new EucaException("diskpart list volume returned exit code " + result.ExitCode);
                 StringReader sr = new StringReader(result.Stdout);                
@@ -870,7 +870,7 @@ namespace Com.Eucalyptus.Windows.EucaServiceLibrary
                     sw.Flush();
                 }
                 List<int> disks = new List<int>(10);
-                Win32_CommandResult result = EucaUtil.SpawnProcessAndWait("diskpart.exe", "/s C:\\diskpart.txt");
+                Win32_CommandResult result = SystemsUtil.SpawnProcessAndWait("diskpart.exe", "/s C:\\diskpart.txt");
                 if (result.ExitCode != 0)
                     throw new EucaException("diskpart list returned exit code "+result.ExitCode);                
                 StringReader sr = new StringReader(result.Stdout);
@@ -902,7 +902,7 @@ namespace Com.Eucalyptus.Windows.EucaServiceLibrary
                         sw.WriteLine("exit");
                         sw.Flush();
                     }
-                    result = EucaUtil.SpawnProcessAndWait("diskpart.exe", "/s C:\\diskpart.txt");
+                    result = SystemsUtil.SpawnProcessAndWait("diskpart.exe", "/s C:\\diskpart.txt");
                     if (result.ExitCode != 0)
                         throw new EucaException("diskpart list partition returned exit code " + result.ExitCode);
                     
@@ -937,7 +937,7 @@ namespace Com.Eucalyptus.Windows.EucaServiceLibrary
                         sw.Flush();
                     }
                     EucaLogger.Debug("Formatting Drive:" + letter);
-                    Win32_CommandResult result = EucaUtil.SpawnProcessAndWait("C:\\dformat.bat", null);
+                    Win32_CommandResult result = SystemsUtil.SpawnProcessAndWait("C:\\dformat.bat", null);
                     if (result.Stdout == null || !result.Stdout.Contains("Format complete"))
                     {
                         StringBuilder sbLog = new StringBuilder();
@@ -1422,7 +1422,7 @@ namespace Com.Eucalyptus.Windows.EucaServiceLibrary
         {
             string output = "";
 
-            Win32_CommandResult result= EucaUtil.SpawnProcessAndWait(Environment.GetFolderPath(Environment.SpecialFolder.System)+"\\nslookup.exe", ipAddr);
+            Win32_CommandResult result= SystemsUtil.SpawnProcessAndWait(Environment.GetFolderPath(Environment.SpecialFolder.System)+"\\nslookup.exe", ipAddr);
             output = result.Stdout;
 
 #if EUCA_DEBUG
@@ -1552,7 +1552,7 @@ namespace Com.Eucalyptus.Windows.EucaServiceLibrary
             string cfgFile = string.Format("{0}{1}.cfg", EucaConstant.ProgramRoot, Guid.NewGuid().ToString());
             try
             {
-                Win32_CommandResult result = EucaUtil.SpawnProcessAndWait(secedit, string.Format("/export /cfg \"{0}\"", cfgFile));
+                Win32_CommandResult result = SystemsUtil.SpawnProcessAndWait(secedit, string.Format("/export /cfg \"{0}\"", cfgFile));
                 if (!File.Exists(cfgFile))
                     throw new Exception(string.Format("Could not find {0}", cfgFile));
 
@@ -1646,7 +1646,7 @@ namespace Com.Eucalyptus.Windows.EucaServiceLibrary
                 string args = string.Format("/configure /db {0}\\security\\new.sdb /cfg \"{1}\" /areas SECURITYPOLICY",
                     Environment.GetEnvironmentVariable("SystemRoot"), newPolicyFile);
 
-                result = EucaUtil.SpawnProcessAndWait(secedit, args);
+                result = SystemsUtil.SpawnProcessAndWait(secedit, args);
 
                 /// for later reversal
                 _passwdPolicyChanged = true;
@@ -1677,7 +1677,7 @@ namespace Com.Eucalyptus.Windows.EucaServiceLibrary
                 string args = string.Format("/configure /db {0}\\security\\new.sdb /cfg \"{1}\" /areas SECURITYPOLICY",
                     Environment.GetEnvironmentVariable("SystemRoot"), _oldConfigFile);
                 string secedit = Environment.GetFolderPath(Environment.SpecialFolder.System) + "\\secedit.exe";
-                Win32_CommandResult result = EucaUtil.SpawnProcessAndWait(secedit, args);
+                Win32_CommandResult result = SystemsUtil.SpawnProcessAndWait(secedit, args);
 #if EUCA_DEBUG
                 EucaLogger.Debug("Password policy reverted");
 #endif
@@ -1708,7 +1708,7 @@ namespace Com.Eucalyptus.Windows.EucaServiceLibrary
         private void ActivateAdminUsingNet()
         {
             Win32_CommandResult result =
-                EucaUtil.SpawnProcessAndWait(Environment.GetFolderPath(Environment.SpecialFolder.System) + "\\net.exe",
+                SystemsUtil.SpawnProcessAndWait(Environment.GetFolderPath(Environment.SpecialFolder.System) + "\\net.exe",
                 "user administrator /active:yes");
             if (!(result.ExitCode == 1 || result.ExitCode == 0))
             {
@@ -1720,7 +1720,7 @@ namespace Com.Eucalyptus.Windows.EucaServiceLibrary
         private void ChangePasswdUsingNet(string username, string password)
         {
             Win32_CommandResult result =
-                EucaUtil.SpawnProcessAndWait(Environment.GetFolderPath(Environment.SpecialFolder.System) + "\\net.exe",
+                SystemsUtil.SpawnProcessAndWait(Environment.GetFolderPath(Environment.SpecialFolder.System) + "\\net.exe",
                  string.Format("user {0} {1}", username, password));
 
             if (!(result.ExitCode == 1 || result.ExitCode == 0))
@@ -1754,7 +1754,7 @@ namespace Com.Eucalyptus.Windows.EucaServiceLibrary
                 _adName = (string)EucaServiceLibraryUtil.GetSvcRegistryValue("ADAddress");
                 _userName = (string)EucaServiceLibraryUtil.GetSvcRegistryValue("ADUsername");
                 _password = (string)EucaServiceLibraryUtil.GetSvcRegistryValue("ADPassword");
-                _password = EucaUtil.Decrypt(_password);
+                _password = SystemsUtil.Decrypt(_password);
 
                 if (EucaServiceLibraryUtil.GetSvcRegistryValue("ADOU") != null)
                     _ou = (string)EucaServiceLibraryUtil.GetSvcRegistryValue("ADOU");
@@ -1947,7 +1947,7 @@ namespace Com.Eucalyptus.Windows.EucaServiceLibrary
                 /// invoke 'net' command line with the list
            /// net localgroup "Remote Desktop Users" /add "DOMAIN\User"  (or replace DOMAIN\User with LocalUser).
                     Win32_CommandResult result = 
-                        EucaUtil.SpawnProcessAndWait(Environment.GetFolderPath(Environment.SpecialFolder.System) + "\\net.exe", 
+                        SystemsUtil.SpawnProcessAndWait(Environment.GetFolderPath(Environment.SpecialFolder.System) + "\\net.exe", 
                         string.Format("localgroup \"Remote Desktop Users\" /add \"{0}\"", username));
                     if (result.ExitCode != 0)
                         throw new Exception(string.Format("net returned exitCode={0}", result.ExitCode));                    
