@@ -750,7 +750,8 @@ namespace Com.Eucalyptus.Windows.EucaServiceLibrary
                 driveLetters.Remove(letter);
                 EucaLogger.Debug("Driver letter chosen for new partition: " + letter);
                 StringBuilder sbDiskPart = new StringBuilder();
-                if (OSEnvironment.OS_Name == OSEnvironment.Enum_OsName.S2008 ||
+                if ( OSEnvironment.OS_Name == OSEnvironment.Enum_OsName.S2012 ||
+                    OSEnvironment.OS_Name == OSEnvironment.Enum_OsName.S2008 ||
                     OSEnvironment.OS_Name == OSEnvironment.Enum_OsName.S2008R2 ||
                     OSEnvironment.OS_Name == OSEnvironment.Enum_OsName.Win7 ||
                     OSEnvironment.OS_Name == OSEnvironment.Enum_OsName.Vista)
@@ -1149,7 +1150,8 @@ namespace Com.Eucalyptus.Windows.EucaServiceLibrary
                 if (OSEnvironment.OS_Name == OSEnvironment.Enum_OsName.Vista ||
                     OSEnvironment.OS_Name == OSEnvironment.Enum_OsName.S2008 || 
                     OSEnvironment.OS_Name == OSEnvironment.Enum_OsName.S2008R2 ||
-                    OSEnvironment.OS_Name == OSEnvironment.Enum_OsName.Win7)
+                    OSEnvironment.OS_Name == OSEnvironment.Enum_OsName.Win7 ||
+                    OSEnvironment.OS_Name == OSEnvironment.Enum_OsName.S2012)
                     regKey = Registry.LocalMachine.OpenSubKey("SYSTEM").OpenSubKey("CurrentControlSet")
                     .OpenSubKey("Services").OpenSubKey("MpsSvc");
                 else
